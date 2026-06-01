@@ -84,25 +84,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' || $_SERVER['REQUEST_METHOD'] === 'OPT
 <link rel="dns-prefetch" href="https://app.ranki.io">
 <link rel="dns-prefetch" href="https://github.com">
 <!-- Preload the brand title font so headings render in Ranki Black on
-     first paint instead of swapping in mid-scroll (fixes the FOUT some
-     users see on hash-jump navigation to #tools / #install). -->
-<link rel="preload" href="https://ranki.io/assets/fonts/ranki_black.woff" as="font" type="font/woff" crossorigin>
+     first paint. Served from /fonts/ on this origin (no CORS), so the
+     browser actually uses it (cross-origin webfonts need ACAO headers
+     and ranki.io doesn't ship them — self-hosting is the simpler fix). -->
+<link rel="preload" href="/fonts/ranki_black.woff" as="font" type="font/woff" crossorigin>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
-/* Ranki Black — title font, served from ranki.io.
-   font-display:optional waits up to 100ms then falls back permanently,
-   eliminating the late-swap FOUT users were seeing on hash-jump nav.
-   The <link rel="preload"> above usually loads it in time. */
+/* Ranki Black — brand title font.
+   Self-hosted under /fonts on this origin so browsers actually apply it
+   (cross-origin webfont without an ACAO header gets silently dropped).
+   font-display:swap → Inter shows for the first ~100ms then Ranki Black
+   swaps in cleanly. The <link rel="preload"> above usually beats paint. */
 @font-face {
   font-family: 'Ranki Black';
-  src: url('https://ranki.io/assets/fonts/ranki_black.woff') format('woff'),
-       url('https://ranki.io/assets/fonts/ranki_black.ttf') format('truetype');
+  src: url('/fonts/ranki_black.woff') format('woff'),
+       url('/fonts/ranki_black.ttf') format('truetype');
   font-weight: 900;
-  font-display: optional;
+  font-display: swap;
 }
 
 :root {
@@ -408,9 +410,9 @@ footer{padding:3rem 0 2rem;border-top:1px solid var(--line);margin-top:3rem}
 
   <section class="hero">
     <div class="container">
-      <div class="eyebrow"><span class="live-dot"></span> Free SEO + AEO MCP server · 13 tools · crafted by SEO pros</div>
-      <h1>The <span class="accent">SEO & AEO MCP server</span><br>for Cursor, Claude & Windsurf</h1>
-      <p class="lede">Free MCP server that audits your site for <strong>SEO</strong> and <strong>AEO</strong> (Answer Engine Optimization), generates <span class="mono">sitemap.xml</span>, <span class="mono">llms.txt</span>, <span class="mono">robots.txt</span>, finds keyword gaps and tells your AI coding agent exactly what to fix. Built for vibe-coders shipping sites with Cursor, Claude Code, Windsurf, ChatGPT Desktop and Lovable — without ever learning what FAQPage schema is. Google rewrites the rules every quarter; AI Overviews ate 30% of clicks; ChatGPT and Perplexity only cite sites with the right structure. We track the moving target — your Claude fixes your repo using your own AI credits.</p>
+      <div class="eyebrow"><span class="live-dot"></span> Free SEO + AEO MCP server · for vibe-coders · 13 tools</div>
+      <h1>How to rank in <span class="accent">Google + AI search</span>,<br>without leaving your IDE.</h1>
+      <p class="lede"><strong>Ranki MCP</strong> is the free <strong>SEO + AEO</strong> Model Context Protocol server for vibe-coders. Plug it into <strong>Cursor</strong>, <strong>Claude Code</strong>, <strong>Claude Desktop</strong>, <strong>Windsurf</strong>, <strong>ChatGPT Desktop</strong> or <strong>Lovable</strong> — your AI gets 13 tools that audit your site, generate <span class="mono">sitemap.xml</span> · <span class="mono">llms.txt</span> · <span class="mono">robots.txt</span>, fix FAQPage schema, find keyword gaps and rewrite the page so <strong>ChatGPT, Perplexity, Claude</strong> and <strong>Google AI Overviews</strong> actually cite you. Built by SEO professionals (in the game since 2009). Uses your AI credits, never ours.</p>
       <div class="cta-row">
         <a href="#install" class="btn btn-primary btn-xl">Install in 30 seconds →</a>
         <a href="#tools" class="btn btn-ghost btn-xl">See the 13 SEO + AEO tools</a>
