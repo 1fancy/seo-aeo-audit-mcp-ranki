@@ -2,20 +2,36 @@
 declare(strict_types=1);
 
 /**
- * File-based per-IP rate limit for unauthenticated MCP advisor calls.
- * 5 calls per IP per UTC day. Files stored under /tmp/ranki-mcp-rl/.
- * Simple, no DB roundtrip, fast enough for our scale.
+ * Per-IP and per-key rate limits for MCP tool calls.
  *
- * Returns a tuple with the new state so the dispatcher can render a
- * human-warm rate-limit message and emit X-RateLimit headers.
+ * Tier               Daily cap        Scope
+ * ----               ---------        -----
+ * Free (no key)      5 calls          IP address
+ * Paid (with key)    500 calls        API key (rk_live_...)
+ *
+ * Counters live in /tmp/ranki-mcp-rl/ as plain files (sha1(scope|day)).
+ * Simple, no DB roundtrip, fast enough for our scale.
  */
 
 const RK_MCP_FREE_LIMIT = 5;
+const RK_MCP_KEYED_LIMIT = 500;
+
+function rk_mcp_check_ip(string $ip): array
+{
+    return rk_mcp_check_scope('ip:'.$ip, RK_MCP_FREE_LIMIT);
+}
+
+function rk_mcp_check_key(string $apiKey): array
+{
+    // Hash the key so the bucket filename doesn't leak the plaintext key
+    // to anyone with shell access to /tmp.
+    return rk_mcp_check_scope('key:'.hash('sha256', $apiKey), RK_MCP_KEYED_LIMIT);
+}
 
 /**
  * @return array{allowed: bool, used: int, limit: int, reset_at: string, seconds_until_reset: int}
  */
-function rk_mcp_check_ip(string $ip): array
+function rk_mcp_check_scope(string $scope, int $limit): array
 {
     $dir = sys_get_temp_dir().'/ranki-mcp-rl';
     if (! is_dir($dir)) {
@@ -23,39 +39,33 @@ function rk_mcp_check_ip(string $ip): array
     }
 
     $day = gmdate('Y-m-d');
-    $file = $dir.'/'.sha1($ip.'|'.$day);
+    $file = $dir.'/'.sha1($scope.'|'.$day);
 
     $count = is_file($file) ? (int) file_get_contents($file) : 0;
-    $allowed = $count < RK_MCP_FREE_LIMIT;
+    $allowed = $count < $limit;
 
     if ($allowed) {
         @file_put_contents($file, (string) ($count + 1));
         $count++;
     }
 
-    // Reset is the next UTC midnight.
     $tomorrow = gmmktime(0, 0, 0, (int) gmdate('n'), (int) gmdate('j') + 1, (int) gmdate('Y'));
 
     return [
         'allowed' => $allowed,
         'used' => $count,
-        'limit' => RK_MCP_FREE_LIMIT,
+        'limit' => $limit,
         'reset_at' => gmdate('Y-m-d\TH:i:s\Z', $tomorrow),
         'seconds_until_reset' => max(0, $tomorrow - time()),
     ];
 }
 
-/**
- * Backward-compat for callers that only need the boolean.
- */
+/** Back-compat for callers that only need the boolean. */
 function rk_mcp_allow_ip(string $ip): bool
 {
     return rk_mcp_check_ip($ip)['allowed'];
 }
 
-/**
- * Pretty "X hours Y minutes" formatting for the reset message.
- */
 function rk_mcp_format_reset(int $seconds): string
 {
     if ($seconds < 60) {

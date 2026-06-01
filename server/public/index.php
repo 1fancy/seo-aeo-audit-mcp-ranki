@@ -18,8 +18,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' || $_SERVER['REQUEST_METHOD'] === 'OPT
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
 <!-- ============== PRIMARY SEO ============== -->
-<title>SEO + AEO MCP Server, Skill & API for Cursor, Claude, Windsurf | Ranki MCP</title>
-<meta name="description" content="Free SEO + AEO MCP server, Claude Skill and REST API for vibe-coders. Audit sites, generate sitemap.xml / llms.txt / robots.txt from Cursor, Claude Code, Windsurf, ChatGPT Desktop. Open source, MIT.">
+<title>Free SEO Audit Tool for Cursor, Claude Code & Windsurf — Ranki MCP</title>
+<meta name="description" content="Free SEO audit and content tool for vibe coders. Generate sitemap.xml, llms.txt, robots.txt, FAQPage schema. Works in Cursor, Claude Code, Windsurf, ChatGPT Desktop, Claude.ai. MCP server plus Claude Skill plus REST API.">
 <meta name="keywords" content="MCP server, MCP for SEO, MCP for AEO, SEO MCP, AEO MCP, MCP for Cursor, MCP for Claude Code, MCP for Windsurf, MCP for ChatGPT Desktop, MCP for Lovable, MCP for v0, MCP server for vibe coding, vibe coder SEO tool, SEO tool for AI coding agents, AI coding SEO, Cursor SEO plugin, Claude Code SEO, Windsurf SEO, llms.txt generator, sitemap.xml generator, robots.txt generator, FAQPage schema generator, JSON-LD generator, Answer Engine Optimization MCP, Google AI Overviews SEO, get cited by ChatGPT, get cited by Perplexity, get cited by Claude, AI search optimization, vibe coded site SEO audit, free SEO audit tool, free AEO audit">
 <meta name="author" content="Ranki.io · 1Fancy Inc.">
 <meta name="creator" content="Younes Lamnabhi">
@@ -130,6 +130,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' || $_SERVER['REQUEST_METHOD'] === 'OPT
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
 html,body{background:var(--bg);color:var(--ink);font-family:'Inter',system-ui,sans-serif;line-height:1.65;-webkit-font-smoothing:antialiased;font-feature-settings:'ss01','cv11';overflow-x:hidden}
+/* Signature: thin gradient bar across the very top of every page — design flourish that ties the dark palette to the orange brand. */
+body::before{content:'';position:fixed;inset:0 0 auto 0;height:2px;background:linear-gradient(90deg,transparent 0%,var(--orange) 30%,var(--orange-2) 70%,transparent 100%);z-index:60;pointer-events:none}
 ::selection{background:var(--orange);color:#000}
 a{color:var(--orange);text-decoration:none;transition:color .15s}
 a:hover{color:var(--orange-2)}
@@ -410,12 +412,12 @@ footer{padding:3rem 0 2rem;border-top:1px solid var(--line);margin-top:3rem}
 
   <section class="hero">
     <div class="container">
-      <div class="eyebrow"><span class="live-dot"></span> Free SEO + AEO MCP · for vibe-coders</div>
-      <h1>Rank in <span class="accent">Google + AI search</span>,<br>without leaving your IDE.</h1>
-      <p class="lede">Free <strong>MCP server</strong> + <strong>Claude Skill</strong> + <strong>REST API</strong> that audit SEO and AEO, generate <span class="mono">sitemap.xml</span>, <span class="mono">llms.txt</span>, <span class="mono">robots.txt</span> — straight from Cursor, Claude Code, Windsurf, ChatGPT Desktop. Built by SEO pros for the people shipping with AI.</p>
+      <div class="eyebrow"><span class="live-dot"></span> Free SEO audit tool · MCP server · 15 SEO tools</div>
+      <h1>Free <span class="accent">SEO audit tool</span> for vibe coders</h1>
+      <p class="lede">Audit any page for SEO and Answer Engine Optimization, generate <span class="mono">sitemap.xml</span>, <span class="mono">llms.txt</span>, <span class="mono">robots.txt</span>, fix FAQPage schema and rewrite titles. Works inside Cursor, Claude Code, Windsurf, ChatGPT Desktop and Claude.ai. The Ranki MCP server, the Claude Skill and the REST API all install in 30 seconds. Free for 5 daily checks per IP, 500 with a free account.</p>
       <div class="cta-row">
         <a href="#install" class="btn btn-primary btn-xl">Install in 30 seconds →</a>
-        <a href="#tools" class="btn btn-ghost btn-xl">See the 13 SEO + AEO tools</a>
+        <a href="#tools" class="btn btn-ghost btn-xl">See the 15 SEO tools</a>
       </div>
 
       <div class="compat-row">
@@ -476,7 +478,7 @@ footer{padding:3rem 0 2rem;border-top:1px solid var(--line);margin-top:3rem}
   <section id="tools">
     <div class="container">
       <div class="section-head">
-        <h2>Thirteen tools your AI can hold</h2>
+        <h2>15 SEO tools that run inside your AI editor</h2>
         <p>The MCP server returns checklists, ready-to-deploy files, and fix recipes. <strong>Your</strong> AI evaluates them against your code. We never run on your tokens — that's why the advisor tools stay free.</p>
         <div class="tools-cats" style="margin-top:1.4rem">
           <span class="tools-cat-pill"><span class="dot"></span> 10 free</span>
@@ -538,8 +540,23 @@ footer{padding:3rem 0 2rem;border-top:1px solid var(--line);margin-top:3rem}
     <div class="container">
       <div class="section-head">
         <h2>Install in 30 seconds</h2>
-        <p>Pick your client. The advisor tools work without a key (five calls per IP per day). Add a free Ranki.io key to remove the limit and unlock the bridge tools.</p>
+        <p>One CLI command auto-detects your editor and writes the right config. Or paste the JSON snippet for your client below. Advisor tools work without a key (5 calls per IP per day); a free account lifts that to 500/day and unlocks the bridge tools.</p>
       </div>
+
+      <div style="max-width:980px;margin:0 auto 2rem;padding:1.4rem 1.6rem;border:1px solid var(--line);border-radius:12px;background:linear-gradient(135deg,rgba(247,144,108,.06),rgba(13,15,20,.6))">
+        <div style="display:flex;align-items:center;gap:.6rem;font-size:.78rem;color:var(--ink-3);text-transform:uppercase;letter-spacing:.06em;font-family:'JetBrains Mono',monospace;margin-bottom:.7rem">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+          One command, every editor
+        </div>
+        <pre class="code" style="margin:0"><button class="copy-btn" onclick="copyCode(this)">Copy</button>npx @ranki/cli install
+<span class="c"># later, to refresh the Skill file:</span>
+npx @ranki/cli update
+<span class="c"># diagnose your setup:</span>
+RANKI_API_KEY=rk_live_... npx @ranki/cli check</pre>
+        <p style="margin-top:.8rem;color:var(--ink-3);font-size:.84rem">Detects Claude Code, Claude Desktop, Cursor, Windsurf and ChatGPT Desktop, then writes the MCP config and downloads the Skill into the right path. Source: <a href="https://github.com/1fancy/ranki-mcp/tree/main/cli">github.com/1fancy/ranki-mcp/tree/main/cli</a>.</p>
+      </div>
+
+      <p style="text-align:center;margin:0 auto 1.6rem;max-width:680px;color:var(--ink-3);font-size:.88rem">Or paste the right snippet manually:</p>
 
       <div class="install-grid">
         <div class="install-block">

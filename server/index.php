@@ -68,42 +68,52 @@ try {
             }
 
             // Keyed tools — verify a key exists before spending an upstream
-            // round-trip. Free tools enforce per-IP rate-limit instead.
-            if (rk_mcp_is_keyed_tool($toolName)) {
+            // round-trip.
+            if (rk_mcp_is_keyed_tool($toolName) && $apiKey === '') {
+                rk_mcp_reply_error(
+                    $id,
+                    -32001,
+                    sprintf(
+                        "This tool (`%s`) reads your private Ranki.io data, so it needs your API key.\n\n".
+                        "1. Generate one at https://app.ranki.io/developer (free, 30 seconds).\n".
+                        "2. Add it to your MCP client config under env.RANKI_API_KEY (stdio) or headers.X-API-Key (HTTP).\n".
+                        "3. Restart the client and retry this tool.",
+                        $toolName
+                    )
+                );
+            }
+
+            // Rate-limit: free tier (no key) is 5/IP/day; keyed tier is
+            // 500/key/day across every tool. Counters are independent.
+            if ($apiKey === '') {
+                $rl = rk_mcp_check_ip(rk_mcp_client_ip());
+            } else {
+                $rl = rk_mcp_check_key($apiKey);
+            }
+            header('X-RateLimit-Limit: '.$rl['limit']);
+            header('X-RateLimit-Remaining: '.max(0, $rl['limit'] - $rl['used']));
+            header('X-RateLimit-Reset: '.$rl['reset_at']);
+
+            if (! $rl['allowed']) {
+                $reset = rk_mcp_format_reset($rl['seconds_until_reset']);
                 if ($apiKey === '') {
                     rk_mcp_reply_error(
                         $id,
-                        -32001,
-                        sprintf(
-                            "This tool (`%s`) reads your private Ranki.io data, so it needs your API key.\n\n".
-                            "1. Generate one at https://app.ranki.io/developer (free, 30 seconds).\n".
-                            "2. Add it to your MCP client config under env.RANKI_API_KEY (stdio) or headers.X-API-Key (HTTP).\n".
-                            "3. Restart the client and retry this tool.",
-                            $toolName
-                        )
+                        -32000,
+                        "You've reached the free daily quota: 5 of 5 calls used from your IP.\n\n".
+                        "Quota resets in {$reset} (at {$rl['reset_at']}).\n\n".
+                        "For 500 calls per day on the same tools, grab a free Ranki.io API key (no credit card):\n".
+                        "  https://app.ranki.io/developer\n\n".
+                        "An API key also unlocks the bridge tools: list_projects, get_article, get_account."
                     );
-                }
-            } else {
-                // Advisor tool — IP rate limit (skipped if a key is present,
-                // because keys carry their own quota signal).
-                if ($apiKey === '') {
-                    $rl = rk_mcp_check_ip(rk_mcp_client_ip());
-                    header('X-RateLimit-Limit: '.$rl['limit']);
-                    header('X-RateLimit-Remaining: '.max(0, $rl['limit'] - $rl['used']));
-                    header('X-RateLimit-Reset: '.$rl['reset_at']);
-
-                    if (! $rl['allowed']) {
-                        $reset = rk_mcp_format_reset($rl['seconds_until_reset']);
-                        rk_mcp_reply_error(
-                            $id,
-                            -32000,
-                            "You've reached the free daily quota — 5 of 5 advisor calls used from your IP.\n\n".
-                            "Your quota resets in {$reset} (at {$rl['reset_at']}).\n\n".
-                            "Want unlimited use right now? Grab a free Ranki.io API key (no credit card) and add it to your MCP client:\n".
-                            "  https://app.ranki.io/developer\n\n".
-                            "With a key, you also unlock the bridge tools (list_projects, get_article, get_account)."
-                        );
-                    }
+                } else {
+                    rk_mcp_reply_error(
+                        $id,
+                        -32000,
+                        "Daily quota reached on this API key: 500 of 500 calls used today.\n\n".
+                        "Quota resets in {$reset} (at {$rl['reset_at']}).\n\n".
+                        "Running a real workload that needs more? Email support@ranki.io with your use case; we lift caps for legit agency and power-user pipelines."
+                    );
                 }
             }
 

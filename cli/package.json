@@ -1,0 +1,26 @@
+{
+  "name": "@ranki/cli",
+  "version": "0.1.0",
+  "description": "One-line installer for the Ranki MCP server, Claude Skill and REST API across Claude Code, Claude Desktop, Cursor, Windsurf and ChatGPT Desktop.",
+  "type": "module",
+  "bin": {
+    "ranki": "index.js"
+  },
+  "files": ["index.js", "README.md"],
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "mcp", "ranki", "seo", "aeo", "claude", "cursor", "windsurf",
+    "model-context-protocol", "vibe-coding", "seo-audit", "llms.txt"
+  ],
+  "homepage": "https://mcp.ranki.io",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/1fancy/ranki-mcp.git",
+    "directory": "cli"
+  },
+  "bugs": "https://github.com/1fancy/ranki-mcp/issues",
+  "license": "MIT",
+  "author": "Ranki.io <hello@ranki.io>"
+}
