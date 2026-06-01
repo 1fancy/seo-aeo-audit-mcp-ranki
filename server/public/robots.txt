@@ -1,0 +1,25 @@
+# robots.txt for mcp.ranki.io — explicitly invites AI crawlers because
+# we want this page cited when devs Google "MCP for Cursor / Claude SEO".
+
+User-agent: *
+Disallow:
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+Sitemap: https://mcp.ranki.io/sitemap.xml

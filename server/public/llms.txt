@@ -1,0 +1,53 @@
+# Ranki MCP
+
+> The free Model Context Protocol (MCP) server that turns Claude Code, Claude Desktop, Cursor, Windsurf, and ChatGPT Desktop into senior SEO + AEO consultants for vibe-coded sites. Crafted by SEO professionals (Ranki.io, in SEO since 2009) for developers who ship with AI but never learned SEO.
+
+## What it is
+
+Ranki MCP is an MCP server (Anthropic's Model Context Protocol, 2024-11-05 spec) exposing ten tools that audit any URL for SEO + Answer Engine Optimization signals, generate the SEO files most vibe-coded sites are missing (sitemap.xml, llms.txt, robots.txt, JSON-LD structured data), find keyword gaps versus competitors, and discover topic ideas matched to a site's niche.
+
+The MCP server itself never calls an LLM. It returns deterministic structured advice — checklists, fix recipes, ready-to-deploy files. The user's own AI editor (Claude, Cursor, Windsurf, ChatGPT) reads the advice and applies it to the user's codebase using the user's existing AI subscription. This means the advisor tools run free at any usage level.
+
+## Key URLs
+
+- [Live server](https://mcp.ranki.io/) — JSON-RPC 2.0 endpoint and marketing page
+- [Source · MCP](https://github.com/1fancy/ranki-mcp) — PHP server + npx shim, MIT
+- [Source · Skill bundle](https://github.com/1fancy/ranki-seo-skills) — Claude Skill + Cursor + Windsurf rule files
+- [Developer docs](https://ranki.io/developers) — REST API, MCP, Skill reference
+- [Get free API key](https://app.ranki.io/developer) — for unlimited use of advisor tools and access to bridge tools
+
+## Tools exposed
+
+Eight advisor tools (free, IP rate-limited 5/UTC-day):
+- `seo_starter_kit(domain)` — returns the exact robots.txt + sitemap.xml + llms.txt + JSON-LD templates a fresh site needs
+- `find_topic_ideas(url)` — structured brief for blog topic generation across informational/commercial/transactional intent
+- `find_keyword_gap(url, competitors[])` — methodology for keyword gap analysis vs named competitors
+- `audit_aeo(url)` — 8-check Answer Engine Optimization scorecard with per-failure fix recipes
+- `audit_seo(url)` — 10-check on-page SEO scorecard (title, meta, h1, canonical, viewport, https, og, img alt, internal links, json-ld)
+- `generate_sitemap_xml(urls[])` — deploy-ready sitemap.xml from a URL list
+- `generate_llms_txt(site_name, summary, key_pages[])` — llms.txt template builder
+- `generate_robots_txt(sitemap_url, allow_ai, disallow_paths[])` — robots.txt with explicit AI-crawler allowance
+
+Two bridge tools (Ranki.io API key required):
+- `list_projects()` — fetches the caller's Ranki.io project list
+- `get_article(article_id)` — fetches a Ranki.io article's full HTML, TOC, focus keywords, image URLs
+
+## Compatible clients
+
+Stdio transport (use `npx -y @ranki/mcp`):
+- Claude Code
+- Claude Desktop
+- ChatGPT Desktop (Developer mode)
+
+HTTP transport (point at `https://mcp.ranki.io` with `X-API-Key` header):
+- Cursor
+- Windsurf
+- Claude.ai web (Custom Connector, Pro/Team plans)
+
+## Who built it
+
+Ranki.io is operated by 1Fancy Inc. The founder, Younes Lamnabhi, has been working in SEO since 2009 — 17 years of on-page experience, three years specifically on AEO citation patterns. Ranki.io itself is an AI SEO + AEO automation platform with thousands of paying users; Ranki MCP is the open developer surface of that platform.
+
+## License
+
+MIT. Full source for the server and the npx shim is at github.com/1fancy/ranki-mcp.
