@@ -2,15 +2,14 @@
 /**
  * Ranki.io MCP server — HTTP/JSON-RPC 2.0 endpoint.
  *
- * Hosted at mcp.ranki.io. Vibe-coders point Claude Desktop / Cursor / Code
- * here (directly, or via the `@ranki/mcp` npx shim). The server returns
- * SEO + AEO advice and structure (sitemap.xml, llms.txt, robots.txt) so
- * the user's own Claude can evaluate the advice against their code.
+ * Hosted at mcp.ranki.io. Clients (Claude Code, Cursor, Windsurf, ChatGPT
+ * Desktop, etc.) POST JSON-RPC 2.0 messages here. Eight advisor tools are
+ * free (rate-limited 5/IP/day); two bridge tools (list_projects,
+ * get_article) plus the whoami tool (get_account) require an X-API-Key
+ * from app.ranki.io.
  *
- * Most tools are advisor-only and require NO key — they're rate-limited
- * per IP (5/day for free, unlimited with X-API-Key against app.ranki.io).
- * Two tools (list_projects, get_article) require a key because they fetch
- * the caller's private Ranki.io data via the REST API at app.ranki.io.
+ * Error messages are written human-first — every failure includes what
+ * went wrong, why it matters, and the exact next step the user can take.
  */
 declare(strict_types=1);
 
@@ -19,6 +18,7 @@ header('Cache-Control: no-store');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Headers: Content-Type, X-API-Key, Authorization');
 header('Access-Control-Allow-Methods: POST, OPTIONS');
+header('Access-Control-Expose-Headers: X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset');
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(204);
@@ -38,12 +38,13 @@ require __DIR__.'/lib/ratelimit.php';
 $raw = file_get_contents('php://input') ?: '';
 $req = json_decode($raw, true);
 if (! is_array($req) || ($req['jsonrpc'] ?? null) !== '2.0' || ! isset($req['method'])) {
-    rk_mcp_reply_error(null, -32600, 'Invalid Request');
+    rk_mcp_reply_error(null, -32600, 'Invalid Request — expected a JSON-RPC 2.0 body with "method" and "jsonrpc": "2.0".');
 }
 
 $method = (string) $req['method'];
 $params = $req['params'] ?? [];
 $id = $req['id'] ?? null;
+$apiKey = trim((string) ($_SERVER['HTTP_X_API_KEY'] ?? ''));
 
 try {
     switch ($method) {
@@ -51,7 +52,7 @@ try {
             rk_mcp_reply($id, [
                 'protocolVersion' => '2024-11-05',
                 'capabilities' => ['tools' => new \stdClass],
-                'serverInfo' => ['name' => 'ranki', 'version' => '0.1.0'],
+                'serverInfo' => ['name' => 'ranki', 'version' => '0.2.0'],
             ]);
             break;
 
@@ -63,19 +64,52 @@ try {
             $toolName = $params['name'] ?? null;
             $args = $params['arguments'] ?? [];
             if (! is_string($toolName) || $toolName === '') {
-                rk_mcp_reply_error($id, -32602, 'Tool name required');
+                rk_mcp_reply_error($id, -32602, 'Missing tool name. Call `tools/list` to see all 11 available tools.');
             }
 
-            // Per-IP rate-limit for advisor tools. Keyed tools (list_projects,
-            // get_article) bypass this because the X-API-Key is its own
-            // quota / billing signal.
-            $apiKey = $_SERVER['HTTP_X_API_KEY'] ?? '';
-            if (! rk_mcp_is_keyed_tool($toolName) && $apiKey === '') {
-                if (! rk_mcp_allow_ip(rk_mcp_client_ip())) {
-                    rk_mcp_reply_error($id, -32000, 'Free tier: 5 calls/day per IP. Set X-API-Key for unlimited (generate at https://app.ranki.io/profile#developer).');
+            // Keyed tools — verify a key exists before spending an upstream
+            // round-trip. Free tools enforce per-IP rate-limit instead.
+            if (rk_mcp_is_keyed_tool($toolName)) {
+                if ($apiKey === '') {
+                    rk_mcp_reply_error(
+                        $id,
+                        -32001,
+                        sprintf(
+                            "This tool (`%s`) reads your private Ranki.io data, so it needs your API key.\n\n".
+                            "1. Generate one at https://app.ranki.io/developer (free, 30 seconds).\n".
+                            "2. Add it to your MCP client config under env.RANKI_API_KEY (stdio) or headers.X-API-Key (HTTP).\n".
+                            "3. Restart the client and retry this tool.",
+                            $toolName
+                        )
+                    );
+                }
+            } else {
+                // Advisor tool — IP rate limit (skipped if a key is present,
+                // because keys carry their own quota signal).
+                if ($apiKey === '') {
+                    $rl = rk_mcp_check_ip(rk_mcp_client_ip());
+                    header('X-RateLimit-Limit: '.$rl['limit']);
+                    header('X-RateLimit-Remaining: '.max(0, $rl['limit'] - $rl['used']));
+                    header('X-RateLimit-Reset: '.$rl['reset_at']);
+
+                    if (! $rl['allowed']) {
+                        $reset = rk_mcp_format_reset($rl['seconds_until_reset']);
+                        rk_mcp_reply_error(
+                            $id,
+                            -32000,
+                            "You've reached the free daily quota — 5 of 5 advisor calls used from your IP.\n\n".
+                            "Your quota resets in {$reset} (at {$rl['reset_at']}).\n\n".
+                            "Want unlimited use right now? Grab a free Ranki.io API key (no credit card) and add it to your MCP client:\n".
+                            "  https://app.ranki.io/developer\n\n".
+                            "With a key, you also unlock the bridge tools (list_projects, get_article, get_account)."
+                        );
+                    }
                 }
             }
 
+            // Dispatch — bridge tools may still 401 if the key is invalid.
+            // rk_mcp_api_call throws \RuntimeException with a friendly
+            // message; the catch below turns it into a JSON-RPC error.
             $result = rk_mcp_call_tool($toolName, is_array($args) ? $args : [], $apiKey);
             rk_mcp_reply($id, $result);
             break;
@@ -85,9 +119,9 @@ try {
             break;
 
         default:
-            rk_mcp_reply_error($id, -32601, "Method not found: {$method}");
+            rk_mcp_reply_error($id, -32601, "Method not found: {$method}. Supported: initialize, tools/list, tools/call, ping.");
     }
 } catch (\Throwable $e) {
     error_log('[ranki-mcp] '.$e->getMessage());
-    rk_mcp_reply_error($id, -32603, 'Internal error: '.$e->getMessage());
+    rk_mcp_reply_error($id, -32603, $e->getMessage());
 }

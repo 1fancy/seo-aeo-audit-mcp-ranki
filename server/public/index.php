@@ -461,7 +461,7 @@ footer{padding:3rem 0 2rem;border-top:1px solid var(--line);margin-top:3rem}
         <div class="install-block">
           <div class="install-head">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-            HTTP · Cursor · Windsurf · Claude.ai web
+            HTTP · Cursor · Windsurf
           </div>
           <div class="install-body">
             <p class="path">.cursor/mcp.json (or .windsurf/mcp.json)</p>
@@ -477,11 +477,46 @@ footer{padding:3rem 0 2rem;border-top:1px solid var(--line);margin-top:3rem}
 <span class="k">}</span></pre>
           </div>
         </div>
+
+        <div class="install-block">
+          <div class="install-head">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+            Claude.ai web · Custom Connector
+          </div>
+          <div class="install-body">
+            <p class="path">claude.ai → Settings → Connectors → Add custom connector</p>
+            <pre class="code"><button class="copy-btn" onclick="copyCode(this)">Copy</button><span class="c">Name:           </span>Ranki
+<span class="c">URL:            </span>https://mcp.ranki.io
+<span class="c">Authentication: </span>Header
+<span class="c">Header name:    </span>X-API-Key
+<span class="c">Header value:   </span>YOUR_KEY</pre>
+            <p style="color:var(--ink-3);font-size:.8rem;margin-top:.7rem;line-height:1.5">Requires Claude.ai Pro, Team, or Enterprise. After saving, open a new chat — Ranki appears under the connector picker (🔌 icon).</p>
+          </div>
+        </div>
+
+        <div class="install-block">
+          <div class="install-head">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+            One-line curl · Claude Code · Cursor · Windsurf
+          </div>
+          <div class="install-body">
+            <p class="path">Paste in your terminal (replace YOUR_KEY)</p>
+            <pre class="code"><button class="copy-btn" onclick="copyCode(this)"><span class="c"># Claude Code (CLI)</span>
+claude mcp add ranki \
+  -e RANKI_API_KEY=YOUR_KEY \
+  -- npx -y @ranki/mcp
+
+<span class="c"># Cursor (writes .cursor/mcp.json in cwd)</span>
+mkdir -p .cursor && cat > .cursor/mcp.json &lt;&lt;EOF
+{"mcpServers":{"ranki":{"url":"https://mcp.ranki.io",
+"headers":{"X-API-Key":"YOUR_KEY"}}}}
+EOF</pre>
+          </div>
+        </div>
       </div>
 
       <p style="text-align:center;margin-top:1.5rem;color:var(--ink-3);font-size:.86rem;padding:0 1rem">
-        Full per-client snippets (Claude Desktop, Claude Code CLI, Claude.ai web, Cursor, Windsurf, ChatGPT Desktop, raw curl) at
-        <a href="https://app.ranki.io/developer">app.ranki.io/developer</a>.
+        After installing, your AI's first tool call should be <span class="mono">get_account</span> — it confirms your key works and shows your plan + limits. If the key is wrong, you'll get a precise error with a fix link.
       </p>
     </div>
   </section>
@@ -509,24 +544,28 @@ footer{padding:3rem 0 2rem;border-top:1px solid var(--line);margin-top:3rem}
           </div>
         </div>
         <div>
-          <pre class="code"><button class="copy-btn" onclick="copyCode(this)">Copy</button><span class="c"># Claude Code (user-level, every project)</span>
-mkdir -p ~/.claude/skills/ranki-seo
+          <pre class="code"><button class="copy-btn" onclick="copyCode(this)">Copy</button><span class="c"># Claude Code · Claude Desktop (user-level)</span>
+mkdir -p ~/.claude/skills/ranki-seo &amp;&amp; \
 curl -fsSL https://raw.githubusercontent.com/\
 1fancy/ranki-seo-skills/main/skills/\
 ranki-seo/SKILL.md \
   -o ~/.claude/skills/ranki-seo/SKILL.md
 
-<span class="c"># Cursor (project-level)</span>
+<span class="c"># Cursor (project-level rule file)</span>
 curl -fsSL https://raw.githubusercontent.com/\
 1fancy/ranki-seo-skills/main/skills/\
-ranki-seo/.cursorrules \
-  -o .cursorrules
+ranki-seo/.cursorrules -o .cursorrules
 
-<span class="c"># Windsurf (project-level)</span>
+<span class="c"># Windsurf (project-level rule file)</span>
 curl -fsSL https://raw.githubusercontent.com/\
 1fancy/ranki-seo-skills/main/skills/\
-ranki-seo/.windsurfrules \
-  -o .windsurfrules</pre>
+ranki-seo/.windsurfrules -o .windsurfrules
+
+<span class="c"># Claude.ai web — Projects (no file install)</span>
+<span class="c"># Open claude.ai → Projects → New project</span>
+<span class="c"># Custom instructions: paste the body of</span>
+<span class="c"># SKILL.md (skip the YAML frontmatter).</span>
+<span class="c"># Every chat in the Project auto-loads it.</span></pre>
         </div>
       </div>
     </div>
@@ -590,7 +629,9 @@ ranki-seo/.windsurfrules \
       <div class="section-head"><h2>Real questions, real answers</h2><p>What vibe-coders actually search for before installing an MCP server.</p></div>
       <div class="faq">
         <div class="faq-item"><div class="faq-q" onclick="this.parentNode.classList.toggle('open')">What is an MCP server, and why do I need one for SEO?</div><div class="faq-a">MCP (Model Context Protocol) is the standard <a href="https://modelcontextprotocol.io" target="_blank" rel="noopener">Anthropic introduced in late 2024</a> for connecting AI agents to external tools. Ranki MCP adds SEO + AEO auditing, sitemap and <span class="mono">llms.txt</span> generation, keyword-gap analysis, and topic discovery — so your AI can fix your vibe-coded site without you having to learn SEO terminology.</div></div>
-        <div class="faq-item"><div class="faq-q" onclick="this.parentNode.classList.toggle('open')">Does this work with Cursor? Windsurf? Lovable? v0? Bolt.new?</div><div class="faq-a">Cursor and Windsurf — yes, native HTTP MCP support, point them at <span class="mono">https://mcp.ranki.io</span>. Claude Code and Claude Desktop — yes, stdio via <span class="mono">npx -y @ranki/mcp</span>. ChatGPT Desktop — yes, via the Developer-mode Tools panel. Lovable / v0 / Bolt.new — those generate code but don't yet expose MCP configs in their UI; the workaround is to install Ranki MCP locally in Claude Code or Cursor, then ask your AI to refactor the Lovable/v0 output with the audits applied.</div></div>
+        <div class="faq-item"><div class="faq-q" onclick="this.parentNode.classList.toggle('open')">Does this work with Cursor? Windsurf? Claude.ai web? Lovable? v0? Bolt.new?</div><div class="faq-a"><strong style="color:var(--ink)">Cursor and Windsurf:</strong> yes, native HTTP MCP support — point them at <span class="mono">https://mcp.ranki.io</span> with an <span class="mono">X-API-Key</span> header.<br><br><strong style="color:var(--ink)">Claude Code, Claude Desktop, ChatGPT Desktop:</strong> yes — stdio MCP via <span class="mono">npx -y @ranki/mcp</span>.<br><br><strong style="color:var(--ink)">Claude.ai web (Pro / Team / Enterprise):</strong> yes — add as a Custom Connector under Settings → Connectors. Same URL + header.<br><br><strong style="color:var(--ink)">Lovable, v0, Bolt.new:</strong> those generate code but don't expose MCP configs in their UI yet. Workaround — install Ranki MCP in your Claude Code or Cursor session, then ask it to refactor the Lovable / v0 / Bolt output. Same result.</div></div>
+        <div class="faq-item"><div class="faq-q" onclick="this.parentNode.classList.toggle('open')">How do I know my API key is set up correctly?</div><div class="faq-a">Ask your AI to call <span class="mono">get_account</span> — it's the whoami of Ranki MCP. If your key works, you get back your name, email, plan, daily and monthly limits, and current usage. If the key is wrong, missing, or revoked, you get a precise error message telling you exactly which line in the MCP config to fix.</div></div>
+        <div class="faq-item"><div class="faq-q" onclick="this.parentNode.classList.toggle('open')">Can I use the Skill on Claude.ai web?</div><div class="faq-a">Claude.ai web doesn't load <span class="mono">SKILL.md</span> files directly the way Claude Code does. But two workarounds: (1) open <strong>Claude.ai Projects</strong> → create a new Project → paste the body of <span class="mono">SKILL.md</span> into the custom instructions — every chat in that Project auto-loads it. (2) The Custom Connector already exposes the Skill's tool selection logic via the tool descriptions themselves, so Claude.ai picks the right tool for the right prompt without the Skill file. Less rich, but works in zero seconds.</div></div>
         <div class="faq-item"><div class="faq-q" onclick="this.parentNode.classList.toggle('open')">Does Ranki MCP use my Claude credits or yours?</div><div class="faq-a"><strong style="color:var(--ink)">Yours.</strong> The MCP server returns structured advice (checklists, fix recipes, generated files). Your AI evaluates them against your code using your own credits. We never make LLM calls on your behalf — that's why the advisor tools can run free.</div></div>
         <div class="faq-item"><div class="faq-q" onclick="this.parentNode.classList.toggle('open')">Was Ranki MCP built by actual SEO professionals?</div><div class="faq-a">Yes. The product is the developer surface of <a href="https://ranki.io" target="_blank" rel="noopener">Ranki.io</a>, an AI SEO + AEO automation platform built by Younes Lamnabhi (in SEO since 2009 — 17 years of on-page work + 3 years of AEO research). The audit logic encodes patterns we use daily for thousands of paying users.</div></div>
         <div class="faq-item"><div class="faq-q" onclick="this.parentNode.classList.toggle('open')">What does AEO mean? Why should I care?</div><div class="faq-a"><strong style="color:var(--ink)">Answer Engine Optimization</strong> — the structural signals (FAQPage schema, definitional intros, author bylines, <span class="mono">llms.txt</span>, comparison tables) that ChatGPT, Claude, Perplexity, and Google AI Overviews use to pick which sites to cite. In 2026, AEO is the fastest-growing search channel and most sites have zero coverage. Audit yours with <span class="mono">audit_aeo</span> in 5 seconds.</div></div>

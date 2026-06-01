@@ -11,7 +11,7 @@ declare(strict_types=1);
  * those and skips IP rate-limiting (key has its own quota).
  */
 
-const RK_MCP_KEYED_TOOLS = ['list_projects', 'get_article'];
+const RK_MCP_KEYED_TOOLS = ['list_projects', 'get_article', 'get_account'];
 
 function rk_mcp_is_keyed_tool(string $name): bool
 {
@@ -108,8 +108,16 @@ function rk_mcp_tool_definitions(): array
             ],
         ],
         [
+            'name' => 'get_account',
+            'description' => 'Check your Ranki.io API key works and see your account snapshot (email, plan, daily and monthly limits, current usage). Best first call after pasting a key. Requires X-API-Key.',
+            'inputSchema' => [
+                'type' => 'object',
+                'properties' => new \stdClass,
+            ],
+        ],
+        [
             'name' => 'list_projects',
-            'description' => 'List the projects in your Ranki.io account. Requires X-API-Key. Returns id, name, url, status. Useful for inspecting what content Ranki.io is generating for you.',
+            'description' => 'List the projects in your Ranki.io account. Returns id, name, url, status, language. Use this to confirm which content Ranki.io is generating for you. Requires X-API-Key.',
             'inputSchema' => [
                 'type' => 'object',
                 'properties' => ['per_page' => ['type' => 'integer', 'description' => 'Default 25, max 50']],
@@ -117,10 +125,10 @@ function rk_mcp_tool_definitions(): array
         ],
         [
             'name' => 'get_article',
-            'description' => 'Fetch a single article from your Ranki.io account by nano_id. Requires X-API-Key. Returns title, content_html, focus_keyword (array), TOC, embedded image URLs, SEO score.',
+            'description' => 'Fetch a single article from your Ranki.io account by nano_id. Returns title, content_html, focus_keyword (array), TOC, embedded image URLs, SEO score. Requires X-API-Key.',
             'inputSchema' => [
                 'type' => 'object',
-                'properties' => ['article_id' => ['type' => 'string', 'description' => 'nano_id of the article (e.g. LISQJJOGF)']],
+                'properties' => ['article_id' => ['type' => 'string', 'description' => 'nano_id of the article (e.g. LISQJJOGF). Get one from list_projects then drill into a project.']],
                 'required' => ['article_id'],
             ],
         ],
@@ -147,7 +155,13 @@ function rk_mcp_call_tool(string $name, array $args, string $apiKey): array
 function rk_mcp_api_call(string $endpoint, string $apiKey, string $method = 'GET'): array
 {
     if ($apiKey === '') {
-        throw new \RuntimeException('This tool requires an API key. Set X-API-Key header — generate one at https://app.ranki.io/profile#developer');
+        throw new \RuntimeException(
+            "This tool reads your private Ranki.io data, so it needs your API key.\n\n".
+            "Generate one in 30 seconds at: https://app.ranki.io/developer\n".
+            "Then set it in your MCP client config:\n".
+            "  • stdio (Claude Desktop / Code): env.RANKI_API_KEY = \"rk_live_...\"\n".
+            "  • HTTP (Cursor / Windsurf):       headers.X-API-Key = \"rk_live_...\""
+        );
     }
 
     $url = 'https://app.ranki.io'.$endpoint;
@@ -160,17 +174,50 @@ function rk_mcp_api_call(string $endpoint, string $apiKey, string $method = 'GET
     ]);
     $body = curl_exec($ch);
     $code = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $err = curl_error($ch);
     curl_close($ch);
 
     if ($body === false) {
-        throw new \RuntimeException('Network error reaching app.ranki.io');
+        throw new \RuntimeException("Couldn't reach app.ranki.io (network error: {$err}). Try again in a moment — this is usually transient.");
     }
+
     $decoded = json_decode((string) $body, true);
-    if (! is_array($decoded)) {
-        throw new \RuntimeException("Unexpected response from app.ranki.io (HTTP {$code})");
+
+    // Translate HTTP-level errors into human messages keyed off the upstream
+    // error code so the user gets a precise next step.
+    if ($code === 401) {
+        $reason = is_array($decoded) ? ($decoded['error'] ?? '') : '';
+        if ($reason === 'missing_api_key') {
+            throw new \RuntimeException(
+                "Your MCP client didn't send the API key header.\n\n".
+                "Double-check the config — stdio clients use env.RANKI_API_KEY, HTTP clients use headers.X-API-Key.\n".
+                "Then restart the client (some IDEs need a full reload before MCP env changes take effect)."
+            );
+        }
+        throw new \RuntimeException(
+            "Your Ranki.io API key isn't valid (it may have been regenerated or revoked).\n\n".
+            "1. Open https://app.ranki.io/developer and click Reveal to copy the current key.\n".
+            "2. Paste it into your MCP client config.\n".
+            "3. Restart the client and retry.\n\n".
+            "If you generated a new key, the previous one stopped working the moment you did."
+        );
     }
+
+    if ($code === 429) {
+        $retry = is_array($decoded) ? ($decoded['retry_after'] ?? null) : null;
+        throw new \RuntimeException(
+            "Rate limited by app.ranki.io (60 requests per minute per key)".
+            ($retry ? ". Retry in {$retry}s." : '. Slow down by a few seconds and retry.')
+        );
+    }
+
+    if (! is_array($decoded)) {
+        throw new \RuntimeException("Unexpected response from app.ranki.io (HTTP {$code}). If this keeps happening, ping support@ranki.io with the request you tried.");
+    }
+
     if ($code >= 400) {
-        throw new \RuntimeException($decoded['message'] ?? 'API error: HTTP '.$code);
+        $msg = $decoded['message'] ?? "app.ranki.io returned HTTP {$code}";
+        throw new \RuntimeException($msg);
     }
 
     return $decoded;
