@@ -1,0 +1,63 @@
+{
+  "name": "@ranki/mcp-ts",
+  "version": "0.1.0",
+  "description": "Ranki MCP — Node/TypeScript reference implementation. Free SEO + AEO + speed + image-optimization tools for Claude Code, Cursor, Windsurf, ChatGPT Desktop and any MCP-capable agent.",
+  "type": "module",
+  "bin": {
+    "ranki-mcp-ts": "./dist/index.js"
+  },
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx src/index.ts",
+    "start": "node dist/index.js",
+    "serve": "node dist/index.js --serve",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "prepublishOnly": "npm run build && npm test"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "seo",
+    "aeo",
+    "answer-engine-optimization",
+    "core-web-vitals",
+    "lighthouse",
+    "claude",
+    "cursor",
+    "windsurf",
+    "chatgpt",
+    "ranki",
+    "ranking"
+  ],
+  "author": "Ranki.io <support@ranki.io>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/1fancy/seo-aeo-audit-mcp-ranki.git",
+    "directory": "ts-server"
+  },
+  "homepage": "https://mcp.ranki.io",
+  "bugs": "https://github.com/1fancy/seo-aeo-audit-mcp-ranki/issues",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.4",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}

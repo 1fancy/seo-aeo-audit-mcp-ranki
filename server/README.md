@@ -29,7 +29,7 @@ curl -X POST http://127.0.0.1:8080/ \
 | `lib/jsonrpc.php` | Reply helpers + client IP detection (Cloudflare-aware). |
 | `lib/registry.php` | Tool definitions + REST API bridge to `app.ranki.io`. |
 | `lib/ratelimit.php` | Per-IP and per-key rate limits (5/IP/UTC-day, 500/key/UTC-day). |
-| `tools/*.php` | One file per MCP tool. 21 in total: 15 free (IP-limited) + 6 bridge (require X-API-Key). |
+| `tools/*.php` | One file per MCP tool. 22 in total: 15 free (IP-limited) + 7 bridge (require X-API-Key). |
 
 ## Tools
 
@@ -41,13 +41,13 @@ curl -X POST http://127.0.0.1:8080/ \
 - **Content and strategy:** `seo_starter_kit`, `find_topic_ideas`, `find_keyword_gap`, `propose_titles_metas`, `explain_seo_terms`
 - **Install:** `install_skill`
 
-6 paid bridge tools (X-API-Key required):
-`get_account`, `list_projects`, `get_article`, `list_rank_tracking`, `list_gsc_keywords`, `ai_visibility`.
+7 paid bridge tools (X-API-Key required):
+`get_account`, `list_projects`, `list_articles`, `get_article`, `list_rank_tracking`, `list_gsc_keywords`, `ai_visibility`.
 
 ## Rate limits
 
 - No key: 5 calls per IP per UTC day. Free tools only.
-- Ranki.io API key (paid plan, [app.ranki.io/developer](https://app.ranki.io/developer)): 500 calls per key per UTC day, plus access to the 6 bridge tools that read your real Google Search Console keywords, rank tracking and AI citations.
+- Ranki.io API key (paid plan, [app.ranki.io/developer](https://app.ranki.io/developer)): 500 calls per key per UTC day, plus access to the 7 bridge tools that read your real Google Search Console keywords, rank tracking, AI citations, project list and article library.
 - Higher caps: email support@ranki.io.
 
 Counters live in `/tmp/ranki-mcp-rl/` as plain files (sha256 of scope + day). Reset at midnight UTC.

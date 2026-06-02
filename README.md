@@ -18,9 +18,18 @@ The CLI auto-detects which AI editor you have installed (Claude Code, Claude Des
 
 Prefer the manual JSON snippet? Examples for each editor are in the [Install](#install) section below.
 
-## What it actually does — 21 tools
+## Two implementations, same tools
 
-The MCP server exposes 21 tools. Your agent calls them like any other MCP tool; they return Markdown reports your agent renders inline and then acts on — converting files, rewriting HTML, generating new ones, committing the result.
+This repo ships the MCP in **two parity implementations** so you can pick whichever fits your stack:
+
+- **[`server/`](server) — PHP 8.4 reference**, the production deployment powering [`mcp.ranki.io`](https://mcp.ranki.io). Hosted, hardened, zero dependencies, runs behind Cloudflare. This is what `mcp.ranki.io` is built on.
+- **[`ts-server/`](ts-server) — Node / TypeScript reference**, published as [`@ranki/mcp-ts`](https://www.npmjs.com/package/@ranki/mcp-ts) on npm. Native-Node alternative for developers who prefer JavaScript tooling, can be installed via `npx -y @ranki/mcp-ts` (stdio) or `npx @ranki/mcp-ts --serve` (HTTP).
+
+Both expose the same 22 tools with the same JSON output, SSRF guard, rate-limit semantics, and security posture. The TS impl runs the 15 free tools natively in Node, and proxies the 7 paid bridge tools to the same REST API at `app.ranki.io` that the PHP server uses. Neither ever opens a database — paid tools go through Laravel's `ApiKeyAuth` middleware and are scoped to the calling user's data.
+
+## What it actually does — 22 tools
+
+The MCP server exposes 22 tools. Your agent calls them like any other MCP tool; they return Markdown reports your agent renders inline and then acts on — converting files, rewriting HTML, generating new ones, committing the result.
 
 ### Audit
 - **`audit_seo(url)`** — 10-check on-page SEO scorecard: title length, meta description, H1 uniqueness, canonical, viewport, HTTPS, OpenGraph completeness, image alt coverage, internal link count, JSON-LD presence. Returns score 0–100 with per-failure fix recipes.
@@ -50,6 +59,7 @@ The MCP server exposes 21 tools. Your agent calls them like any other MCP tool; 
 ### Your Ranki.io account — real ranking data inside your IDE (paid API key)
 - **`get_account()`** — whoami for your API key: name, email, plan, daily and monthly limits, current usage.
 - **`list_projects()`** — lists projects in your [Ranki.io](https://ranki.io) account.
+- **`list_articles(project_id)`** — paginated index of articles in a project: nano_id, title, status, language, focus_keyword[], TOC outline, word count, SEO score. Optional status filter.
 - **`get_article(article_id)`** — fetches a single article by its `nano_id`: title, HTML, focus keywords, table of contents, embedded image URLs, SEO score.
 - **`list_rank_tracking(project_id)`** — Google Search Console summary for a project: 28-day totals, top 20 keywords by clicks, top 20 opportunity keywords (position > 10 with impressions — the easy wins).
 - **`list_gsc_keywords(project_id)`** — full paginated GSC keyword list, sortable by clicks / impressions / position / CTR.
@@ -85,7 +95,7 @@ The Skill file (in [ranki-seo-skills](https://github.com/1fancy/ranki-seo-skills
 | Tier | Daily cap | Scope | Tools available |
 |---|---|---|---|
 | No key | 5 calls | per IP | 15 free tools (audits, generators, speed, image optimization, content strategy, install) |
-| Ranki.io API key | 500 calls | per key | All 21 tools, including the 6 bridge tools that read your real GSC keywords, rank tracking and AI citations from your Ranki.io account |
+| Ranki.io API key | 500 calls | per key | All 22 tools, including the 7 bridge tools that read your real GSC keywords, rank tracking, AI citations, project list and article library from your Ranki.io account |
 
 Get a key at [app.ranki.io/developer](https://app.ranki.io/developer). `X-RateLimit-Limit`, `X-RateLimit-Remaining` and `X-RateLimit-Reset` are returned on every response. The dispatcher's error messages include the reset countdown and the upgrade path.
 
@@ -109,7 +119,7 @@ Add to `~/.claude/claude_desktop_config.json`:
 }
 ```
 
-Restart Claude Desktop. The MCP indicator should show **ranki** with 21 tools.
+Restart Claude Desktop. The MCP indicator should show **ranki** with 22 tools.
 
 ### Cursor (HTTP transport, no npx needed)
 
@@ -206,7 +216,7 @@ Claude (via Ranki MCP):
 ┌────────────────────────┐         ┌──────────────────────────┐
 │  Claude / Cursor / etc │         │  mcp.ranki.io (PHP)      │
 │                        │         │                          │
-│  1. Sees 21 tools      │ JSON-RPC│  - 21 tool definitions   │
+│  1. Sees 22 tools      │ JSON-RPC│  - 22 tool definitions   │
 │  2. Decides to use one ├────────►│  - HTTP + stdio (npx)    │
 │  3. Receives advice    │         │  - 5/IP or 500/key per   │
 │  4. Acts on the repo   │         │    UTC day rate limit    │
