@@ -46,7 +46,7 @@ export async function runHttp(opts: { host: string; port: number }): Promise<voi
     try {
       await handle(req, res);
     } catch (e) {
-      console.error('[ranki-mcp-ts] uncaught:', e);
+      console.error('[ranki-seo-aeo-mcp] uncaught:', e);
       if (!res.headersSent) {
         res.writeHead(500, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ error: 'internal_error' }));
@@ -56,7 +56,7 @@ export async function runHttp(opts: { host: string; port: number }): Promise<voi
 
   server.listen(opts.port, opts.host, () => {
     const where = opts.host === '0.0.0.0' ? '<all interfaces>' : opts.host;
-    process.stderr.write(`ranki-mcp-ts listening on http://${where}:${opts.port}\n`);
+    process.stderr.write(`ranki-seo-aeo-mcp listening on http://${where}:${opts.port}\n`);
     process.stderr.write(`  POST JSON-RPC 2.0 envelopes (initialize / tools/list / tools/call / ping).\n`);
   });
 }
@@ -228,7 +228,7 @@ async function handle(req: http.IncomingMessage, res: http.ServerResponse): Prom
         );
     }
   } catch (e) {
-    console.error('[ranki-mcp-ts]', e);
+    console.error('[ranki-seo-aeo-mcp]', e);
     return replyError(res, id, -32603, e instanceof Error ? e.message : String(e));
   }
 }

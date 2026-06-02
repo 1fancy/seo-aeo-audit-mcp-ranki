@@ -1,10 +1,10 @@
 {
-  "name": "@ranki.io/mcp-ts",
+  "name": "@ranki.io/seo-aeo-mcp",
   "version": "0.1.0",
-  "description": "Ranki MCP — Node/TypeScript reference implementation. Free SEO + AEO + speed + image-optimization tools for Claude Code, Cursor, Windsurf, ChatGPT Desktop and any MCP-capable agent.",
+  "description": "Free SEO audit + AEO audit MCP server for Claude Code, Cursor, Windsurf and ChatGPT Desktop. 22 tools: on-page SEO scorecard, Answer Engine Optimization checks, Google Core Web Vitals via PageSpeed Insights, image optimization (AVIF + WebP + responsive picture markup), sitemap.xml / llms.txt / robots.txt generation, hidden-page classifier, title + meta proposals, keyword gap analysis, topic ideas, plus paid bridge tools to your Google Search Console keywords and AI citations.",
   "type": "module",
   "bin": {
-    "ranki-mcp-ts": "./dist/index.js"
+    "ranki-seo-aeo-mcp": "./dist/index.js"
   },
   "exports": {
     ".": "./dist/index.js"
@@ -30,21 +30,45 @@
     "node": ">=20"
   },
   "keywords": [
-    "mcp",
-    "model-context-protocol",
     "seo",
+    "seo-audit",
+    "seo-tool",
+    "seo-mcp",
     "aeo",
+    "aeo-audit",
+    "aeo-mcp",
     "answer-engine-optimization",
+    "ai-search-optimization",
+    "mcp",
+    "mcp-server",
+    "model-context-protocol",
     "core-web-vitals",
-    "lighthouse",
-    "claude",
+    "lighthouse-audit",
+    "pagespeed-insights",
+    "image-optimization",
+    "webp",
+    "avif",
+    "sitemap-generator",
+    "llms-txt",
+    "robots-txt",
+    "json-ld",
+    "faqpage-schema",
+    "google-search-console",
+    "chatgpt-citations",
+    "claude-citations",
+    "perplexity-citations",
+    "ai-overviews",
+    "vibe-coding",
+    "claude-code",
+    "claude-desktop",
     "cursor",
     "windsurf",
-    "chatgpt",
+    "chatgpt-desktop",
     "ranki",
-    "ranking"
+    "ranking",
+    "ranki-io"
   ],
-  "author": "Ranki.io <support@ranki.io>",
+  "author": "Ranki.io <support@ranki.io> (https://ranki.io)",
   "license": "MIT",
   "repository": {
     "type": "git",

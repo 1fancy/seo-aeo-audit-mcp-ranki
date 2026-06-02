@@ -23,7 +23,7 @@ Prefer the manual JSON snippet? Examples for each editor are in the [Install](#i
 This repo ships the MCP in **two parity implementations** so you can pick whichever fits your stack:
 
 - **[`server/`](server) — PHP 8.4 reference**, the production deployment powering [`mcp.ranki.io`](https://mcp.ranki.io). Hosted, hardened, zero dependencies, runs behind Cloudflare. This is what `mcp.ranki.io` is built on.
-- **[`ts-server/`](ts-server) — Node / TypeScript reference**, published as [`@ranki.io/mcp-ts`](https://www.npmjs.com/package/@ranki.io/mcp-ts) on npm. Native-Node alternative for developers who prefer JavaScript tooling, can be installed via `npx -y @ranki.io/mcp-ts` (stdio) or `npx @ranki.io/mcp-ts --serve` (HTTP).
+- **[`ts-server/`](ts-server) — Node / TypeScript reference**, published as [`@ranki.io/seo-aeo-mcp`](https://www.npmjs.com/package/@ranki.io/seo-aeo-mcp) on npm. Native-Node alternative for developers who prefer JavaScript tooling, installable via `npx -y @ranki.io/seo-aeo-mcp` (stdio) or `npx @ranki.io/seo-aeo-mcp --serve` (HTTP).
 
 Both expose the same 22 tools with the same JSON output, SSRF guard, rate-limit semantics, and security posture. The TS impl runs the 15 free tools natively in Node, and proxies the 7 paid bridge tools to the same REST API at `app.ranki.io` that the PHP server uses. Neither ever opens a database — paid tools go through Laravel's `ApiKeyAuth` middleware and are scoped to the calling user's data.
 
