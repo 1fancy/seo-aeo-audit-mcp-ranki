@@ -1,23 +1,50 @@
 {
   "name": "@ranki.io/mcp",
   "version": "0.1.0",
-  "description": "Ranki.io MCP server — SEO + AEO advisor for Claude Code, Claude Desktop, Cursor. Audits sites, generates sitemap.xml/llms.txt/robots.txt, and bridges your Ranki.io account.",
+  "description": "Stdio shim for the hosted Ranki MCP server at mcp.ranki.io. 22 free SEO + AEO + Core Web Vitals + image-optimization tools for Claude Code, Claude Desktop, Cursor, Windsurf and ChatGPT Desktop. Proxies stdio JSON-RPC to the HTTPS endpoint with your X-API-Key.",
   "type": "module",
   "main": "index.js",
   "bin": {
     "ranki-mcp": "index.js"
   },
-  "files": ["index.js", "README.md"],
+  "files": ["index.js", "README.md", "LICENSE"],
   "engines": {
     "node": ">=18"
   },
-  "keywords": ["mcp", "model-context-protocol", "seo", "aeo", "claude", "cursor", "ranki", "vibe-coding"],
+  "keywords": [
+    "mcp",
+    "mcp-server",
+    "mcp-shim",
+    "model-context-protocol",
+    "seo",
+    "seo-audit",
+    "seo-mcp",
+    "aeo",
+    "aeo-audit",
+    "answer-engine-optimization",
+    "core-web-vitals",
+    "ranki",
+    "ranki-io",
+    "claude-code",
+    "claude-desktop",
+    "cursor",
+    "windsurf",
+    "chatgpt-desktop",
+    "vibe-coding",
+    "llms-txt",
+    "robots-txt",
+    "sitemap-generator"
+  ],
   "homepage": "https://mcp.ranki.io",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ranki-io/mcp.git"
+    "url": "git+https://github.com/1fancy/seo-aeo-audit-mcp-ranki.git",
+    "directory": "npx"
   },
-  "bugs": "https://github.com/ranki-io/mcp/issues",
+  "bugs": "https://github.com/1fancy/seo-aeo-audit-mcp-ranki/issues",
   "license": "MIT",
-  "author": "Ranki.io <hello@ranki.io>"
+  "author": "Ranki.io <support@ranki.io> (https://ranki.io)",
+  "publishConfig": {
+    "access": "public"
+  }
 }

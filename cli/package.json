@@ -1,18 +1,39 @@
 {
   "name": "@ranki.io/cli",
   "version": "0.1.0",
-  "description": "One-line installer for the Ranki MCP server, Claude Skill and REST API across Claude Code, Claude Desktop, Cursor, Windsurf and ChatGPT Desktop.",
+  "description": "One-line installer for the Ranki MCP server, Claude Skill and REST API. Auto-detects Claude Code, Claude Desktop, Cursor, Windsurf and ChatGPT Desktop and writes the right MCP config for each. Free SEO + AEO + Core Web Vitals + image-optimization tools, MIT licensed.",
   "type": "module",
   "bin": {
     "ranki": "index.js"
   },
-  "files": ["index.js", "README.md"],
+  "files": ["index.js", "README.md", "LICENSE"],
   "engines": {
     "node": ">=18"
   },
   "keywords": [
-    "mcp", "ranki", "seo", "aeo", "claude", "cursor", "windsurf",
-    "model-context-protocol", "vibe-coding", "seo-audit", "llms.txt"
+    "mcp",
+    "mcp-installer",
+    "mcp-server",
+    "model-context-protocol",
+    "seo",
+    "seo-audit",
+    "seo-mcp",
+    "aeo",
+    "aeo-audit",
+    "answer-engine-optimization",
+    "ranki",
+    "ranki-io",
+    "claude-code",
+    "claude-desktop",
+    "cursor",
+    "windsurf",
+    "chatgpt-desktop",
+    "vibe-coding",
+    "llms-txt",
+    "robots-txt",
+    "sitemap-generator",
+    "core-web-vitals",
+    "image-optimization"
   ],
   "homepage": "https://mcp.ranki.io",
   "repository": {
@@ -22,5 +43,8 @@
   },
   "bugs": "https://github.com/1fancy/seo-aeo-audit-mcp-ranki/issues",
   "license": "MIT",
-  "author": "Ranki.io <hello@ranki.io>"
+  "author": "Ranki.io <support@ranki.io> (https://ranki.io)",
+  "publishConfig": {
+    "access": "public"
+  }
 }
